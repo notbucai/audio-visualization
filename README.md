@@ -10,7 +10,12 @@
 > 请参考: ./docs/demo.html 或者 [点击我](https://wuxinweb.github.io/audio-visualization/demo.html)
 
 ## 使用方法 
-
+1. script引入  
+下载index.js 正常引入  
+2. require 
+npm install audio-visualization  
+require('audio-visualization');
+ 
 ```JavaScript
 const av = new AudioVisualization({
   url: './1.mp3',
