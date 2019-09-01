@@ -33,6 +33,9 @@
 
 	</div>
 
+	<button onclick="playAv()">
+		播放
+	</button>
 
 	<script>
 		// 基于准备好的dom，初始化echarts实例
@@ -191,13 +194,19 @@
 		var myChart = echarts.init(document.getElementById('main'));
 		const app = document.querySelector('#app');
 
-		av.play(function ({frequency}) {
 
-			const option = this.getOption([...Array.from(frequency).reverse(), ...frequency], 3);
-			myChart.setOption(option);
+		function playAv() {
+			console.log(123);
+			
+			av.play(function ({ frequency }) {
 
-			roundDom(app,frequency);
-		});
+				const option = this.getOption([...Array.from(frequency).reverse(), ...frequency], 3);
+				myChart.setOption(option);
+
+				roundDom(app, frequency);
+			});
+		}
+
 		function roundDom(el, data) {
 
 			const f = document.createDocumentFragment();
