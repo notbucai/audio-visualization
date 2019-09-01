@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://cdn.bootcss.com/echarts/4.3.0-rc.1/echarts.min.js"></script>
+	<script src="./index.js"></script>
+	<style>
+		#app {
+			position: absolute;
+			transform: translate(600px, 400px) rotate(90deg);
+			width: 1px;
+			height: 1px;
+			background-color: #00f;
+		}
+
+		#app div {
+			display: flex;
+			align-items: flex-end;
+			height: 300px;
+			width: 20px;
+			position: absolute;
+			/* transform: translate(100px); */
+		}
+	</style>
+</head>
+
+<body>
+	<div id="main" style="width: 800px;height:500px;"></div>
+
+	<div id="app">
+
+	</div>
+
+
+	<script>
+		// 基于准备好的dom，初始化echarts实例
+
+
+		function getOption(data, type = 3) {
+			if (type === 1)
+				option = {
+					animation: false,
+					title: {
+						left: 'center',
+						text: '音乐可视化',
+					},
+					xAxis: {
+						show: true,
+						data: data,
+					},
+					yAxis: {
+						show: false,
+						axisLine: {
+							show: false
+						},
+						axisTick: {
+							show: false
+						},
+						axisLabel: {
+							textStyle: {
+								color: '#999'
+							}
+						}
+					},
+
+					series: [
+						{ // For shadow
+							type: 'bar',
+							itemStyle: {
+								normal: { color: 'rgba(0,0,0,0.05)' }
+							},
+							barGap: '-2%',
+							barCategoryGap: '2%',
+							data: data,
+							animation: true
+						},
+						{
+							animation: false,
+							type: 'bar',
+							itemStyle: {
+								normal: {
+									color: new echarts.graphic.LinearGradient(
+										0, 0, 0, 1,
+										[
+											{ offset: 0, color: '#a54' },
+											{ offset: 0.5, color: '#a3aa88' },
+											{ offset: 1, color: '#83bff6' }
+										]
+									)
+								},
+
+							},
+							data: data,
+						}
+					]
+				};
+			if (type === 2)
+				option = {
+
+					// Make gradient line here
+					animation: false,
+					title: [{
+						left: 'center',
+						text: 'Gradient along the x axis'
+					}],
+					tooltip: {
+						trigger: 'axis'
+					},
+					xAxis: [{
+						data: data,
+
+					}],
+					yAxis: [{
+						splitLine: { show: false }
+					}],
+					series: [{
+						animation: false,
+						type: 'line',
+						showSymbol: false,
+						data: data,
+					}]
+				};
+			if (type === 3)
+				option = {
+					animation: false,
+					title: {
+						left: 'center',
+						text: '音乐可视化',
+					},
+					xAxis: {
+						type: 'category',
+						boundaryGap: false,
+					},
+					yAxis: {
+						show: false,
+						type: 'value',
+						boundaryGap: [0, '10%']
+					},
+					series: [
+						{
+							animation: false,
+							name: '模拟数据',
+							type: 'line',
+							smooth: true,
+							symbol: 'none',
+							sampling: 'average',
+							itemStyle: {
+								color: 'rgb(255, 70, 131)'
+							},
+							areaStyle: {
+								color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+									offset: 0,
+									color: 'rgb(255, 158, 68)'
+								}, {
+									offset: 1,
+									color: 'rgb(255, 70, 131)'
+								}])
+							},
+							data: data,
+						}
+					]
+				};
+
+			return option;
+		}
+
+		function getElenemt(data) {
+			const angle = (360 / data.length);
+
+			return data.map((item, index) => {
+				const el = document.createElement('div');
+				const elp = document.createElement('p');
+
+				elp.style.width = "4px";
+				elp.style.height = (item / 2) + "px";
+				elp.style.backgroundColor = "#f99";
+				el.append(elp);
+				el.style.transform = `rotate(${angle * (index + 1)}deg) translate(${300}px) rotate(90deg)`;
+
+				return el;
+			});
+		}
+
+		const av = new AudioVisualization({
+			url: './1.mp3',
+			loop: false,
+		});
+		console.log(av);
+
+		var myChart = echarts.init(document.getElementById('main'));
+		const app = document.querySelector('#app');
+
+		av.play(function ({frequency}) {
+
+			const option = this.getOption([...Array.from(frequency).reverse(), ...frequency], 3);
+			myChart.setOption(option);
+
+			roundDom(app,frequency);
+		});
+		function roundDom(el, data) {
+
+			const f = document.createDocumentFragment();
+			f.append.apply(f, getElenemt([...Array.from(data).reverse(), ...Array.from(data)]))
+
+			app.innerHTML = "";
+			app.append(f);
+		}
+
+
+		(async function () {
+			'use strict';
+			// 指定图表的配置项和数据
+			// const res = await fetch('./1.mp3');
+			const res = await fetch('./Alan+Walker+–+Alone.mp3');
+
+			// const res = await fetch('./AZ.mp3');
+
+			const arraybufferData = await res.arrayBuffer();
+
+			const actx = new window.AudioContext();
+
+			const buffer = await actx.decodeAudioData(arraybufferData);
+			// 音频源
+			const source = actx.createBufferSource();
+			source.buffer = buffer;
+			const analyser = actx.createAnalyser();
+			analyser.smoothingTimeConstant = 0.9;
+			// analyser.maxDecibels = 1;
+			// analyser.minDecibels = -90;
+			// analyser.maxDecibels = 10;
+			analyser.fftSize = 64;
+
+			// console.log(source, actx);
+			source.connect(analyser);
+			source.start(0);
+			source.loop = true;
+
+			analyser.connect(actx.destination);
+
+			const frequency = new Uint8Array(analyser.frequencyBinCount);
+
+			const gainNode = actx.createGain();
+			source.connect(gainNode);
+			gainNode.connect(actx.destination);
+			gainNode.gain.setValueAtTime(0.1, actx.currentTime);
+
+			const app = document.querySelector('#app');
+
+			function a() {
+				setInterval(() => {
+					analyser.getByteFrequencyData(frequency);
+
+					const option = getOption([...Array.from(frequency).reverse(), ...Array.from(frequency)]);
+
+					myChart.setOption(option);
+					const f = document.createDocumentFragment();
+					f.append.apply(f, getElenemt([...Array.from(frequency).reverse(), ...Array.from(frequency)]))
+
+					app.innerHTML = "";
+					app.append(f);
+
+					// 使用刚指定的配置项和数据显示图表。
+				}, 0);
+			}
+		})();
+	</script>
+</body>
+
+</html>
