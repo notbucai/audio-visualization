@@ -37,7 +37,6 @@
 	<script>
 		// 基于准备好的dom，初始化echarts实例
 
-
 		function getOption(data, type = 3) {
 			if (type === 1)
 				option = {
@@ -208,63 +207,6 @@
 			app.append(f);
 		}
 
-
-		(async function () {
-			'use strict';
-			// 指定图表的配置项和数据
-			// const res = await fetch('./1.mp3');
-			const res = await fetch('./Alan+Walker+–+Alone.mp3');
-
-			// const res = await fetch('./AZ.mp3');
-
-			const arraybufferData = await res.arrayBuffer();
-
-			const actx = new window.AudioContext();
-
-			const buffer = await actx.decodeAudioData(arraybufferData);
-			// 音频源
-			const source = actx.createBufferSource();
-			source.buffer = buffer;
-			const analyser = actx.createAnalyser();
-			analyser.smoothingTimeConstant = 0.9;
-			// analyser.maxDecibels = 1;
-			// analyser.minDecibels = -90;
-			// analyser.maxDecibels = 10;
-			analyser.fftSize = 64;
-
-			// console.log(source, actx);
-			source.connect(analyser);
-			source.start(0);
-			source.loop = true;
-
-			analyser.connect(actx.destination);
-
-			const frequency = new Uint8Array(analyser.frequencyBinCount);
-
-			const gainNode = actx.createGain();
-			source.connect(gainNode);
-			gainNode.connect(actx.destination);
-			gainNode.gain.setValueAtTime(0.1, actx.currentTime);
-
-			const app = document.querySelector('#app');
-
-			function a() {
-				setInterval(() => {
-					analyser.getByteFrequencyData(frequency);
-
-					const option = getOption([...Array.from(frequency).reverse(), ...Array.from(frequency)]);
-
-					myChart.setOption(option);
-					const f = document.createDocumentFragment();
-					f.append.apply(f, getElenemt([...Array.from(frequency).reverse(), ...Array.from(frequency)]))
-
-					app.innerHTML = "";
-					app.append(f);
-
-					// 使用刚指定的配置项和数据显示图表。
-				}, 0);
-			}
-		})();
 	</script>
 </body>
 
