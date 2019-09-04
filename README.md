@@ -1,6 +1,12 @@
 # 音频可视化
 
-![build](https://img.shields.io/appveyor/ci/wuxinweb/audio-visualization)
+![npm](https://img.shields.io/npm/v/audio-visualization)
+![dw](https://img.shields.io/npm/dw/audio-visualization)
+![npm](https://img.shields.io/npm/l/audio-visualization)
+![min](https://img.shields.io/bundlephobia/min/audio-visualization)
+![tag](https://img.shields.io/github/v/tag/wuxinweb/audio-visualization)
+![date](https://img.shields.io/date/1567611291)
+
 
 ## 简介
 `audio-visualization` 是一个通过 `WEB-AUDIO-API` 实现的实现的音乐可视化的库，通过本库你可以获取到`当前音频`的音频频谱。  
