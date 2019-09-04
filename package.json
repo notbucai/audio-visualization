@@ -14,7 +14,7 @@
     "audio",
     "visualization"
   ],
-  "types": "./index.d.ts",
+  "typings":"types/index.d.ts",
   "author": "bucai",
   "license": "ISC"
 }
