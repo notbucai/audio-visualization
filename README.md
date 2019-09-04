@@ -9,13 +9,16 @@
 
 > 请参考: ./docs/demo.html 或者 [点击我](https://wuxinweb.github.io/audio-visualization/demo.html)
 
-## 使用方法 
+## 使用方法  `已支持语法提示`
 1. script引入  
-下载index.js 正常引入  
-2. require 
-npm install audio-visualization  
-require('audio-visualization');
- 
+`下载index.js 正常引入  `
+2. require   
+`npm install audio-visualization`  
+`require('audio-visualization');`  
+3. webpack / vue  
+`import AV from 'audio-visualization';`  
+
+
 ```JavaScript
 const av = new AudioVisualization({
   url: './1.mp3',
@@ -30,3 +33,7 @@ av.play(function ({frequency}) {
   console.log(frequency);
 });
 ```
+
+## 更新记录
+
+> time: **2019-09-04** versions: **0.0.3** 引入 `d.ts` 支持语法提示
