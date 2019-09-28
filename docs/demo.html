@@ -23,19 +23,54 @@
 			position: absolute;
 			/* transform: translate(100px); */
 		}
+
+		#action {
+			position: fixed;
+			top: 20%;
+			right: 0;
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: column;
+			padding: 10px;
+			width: 100px;
+			min-height: 200px;
+			background-color: #fff;
+			box-shadow: 0px 0px 2px #01a9f4;
+			border-radius: 4px;
+		}
+
+		#action button {
+			padding: 10px 20px;
+			border: 0;
+			outline: none;
+			margin-bottom: 10px;
+			color: #fff;
+			background-color: #03a9f4;
+			border-radius: 4px;
+
+		}
+
+		#action button:last-child {
+			margin-bottom: 0;
+		}
 	</style>
 </head>
 
 <body>
+
+
+	<div id="action">
+		<button class="play" onclick="playAv()">播放</button>
+		<button class="play" onclick="suspendAv()">暂停</button>
+		<button class="play" onclick="stopAv()">停止</button>
+		<p class="timeshow"></p>
+	</div>
+
 	<div id="main" style="width: 800px;height:500px;"></div>
 
 	<div id="app">
 
 	</div>
-
-	<button onclick="playAv()">
-		播放
-	</button>
 
 	<script>
 		// 基于准备好的dom，初始化echarts实例
@@ -186,7 +221,8 @@
 		}
 
 		const av = new AudioVisualization({
-			url: 'https://bucai-1252379971.cos.ap-guangzhou.myqcloud.com/1.mp3',
+			// url: 'https://bucai-1252379971.cos.ap-guangzhou.myqcloud.com/1.mp3',
+			url: 'http://m10.music.126.net/20190928224451/f5bc80664ab64ba0e7a39c6e85657842/ymusic/24bd/e9e1/2b6c/e2084de498685dcea42a7bb4dc8a8f93.mp3',
 			loop: false,
 		});
 		console.log(av);
@@ -196,16 +232,30 @@
 
 
 		function playAv() {
-			console.log(123);
-			
-			av.play(function ({ frequency }) {
+			console.log('playAv');
+			av.play(function ({ frequency, currentTime, audiostate }) {
+
+				// console.log(currentTime);
+
+				document.querySelector('.timeshow').innerHTML = `进度: ${currentTime.toFixed(3)}<br/>状态：${audiostate}`;
 
 				const option = this.getOption([...Array.from(frequency).reverse(), ...frequency], 3);
 				myChart.setOption(option);
 
 				roundDom(app, frequency);
+
 			});
 		}
+
+		function stopAv() {
+			console.log('stop');
+			av.stop();
+		}
+		function suspendAv() {
+			console.log('stop');
+			av.suspend();
+		}
+
 
 		function roundDom(el, data) {
 

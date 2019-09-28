@@ -19,11 +19,15 @@
     /** @type {Uint8Array} */
     this.frequency = null;
     this.state = false;
+    // 0表示未启动 1表示运行中 2表示暂停 3表示停止
+    this.audiostate = 0;
     this.init();
   }
 
   AudioVisualization.prototype = {
-
+    get currentTime() {
+      return this.audioContext && this.audioContext.currentTime;
+    },
     async init() {
       await this.initAudioContext();
       await this.intiAnalyser();
@@ -37,6 +41,7 @@
 
       /** @type {AudioContext} */
       this.audioContext = new window.AudioContext();
+      this.audioContext.suspend();
     },
     // 初始化音频时间和频率数据对象
     async intiAnalyser() {
@@ -56,6 +61,8 @@
       this.source.connect(this.analyser);
       // 连接输出设备
       this.analyser.connect(this.audioContext.destination);
+      // 是否循环播放
+      this.source.loop = this.loop;
     },
     // 初始化设备控制
     // 控制音频图的整体增益（或音量）
@@ -87,25 +94,54 @@
     async _forFrequency() {
       this.analyser.getByteFrequencyData(this.frequency);
     },
+    // 轮询
     exex(fn) {
-      setInterval(() => {
+      clearInterval(this.timerIndex);
+      this.timerIndex = setInterval(() => {
         this._forFrequency();
-        fn && fn({ frequency: Array.from(this.frequency) });
+        fn && fn({ frequency: Array.from(this.frequency), currentTime: this.currentTime, audiostate: this.audiostate });
       }, 0);
     },
+    /**
+     * @param {function} fn 回调
+     */
     play(fn) {
+      if (this.audiostate === 3) {
+        throw new Error('已经停止无法继续请重新new一个对象');
+      }
       const timer = setInterval(() => {
         if (this.state) {
           clearInterval(timer);
-          this.source.start(0);
-          this.source.loop = this.loop;
+          // 判断状态 执行对应的函数
+          if (this.audiostate === 0) {
+            this.start();
+          } else if (this.audiostate != 3 && this.audiostate != 1) {
+            this.resume();
+          }
           this.exex(fn);
         }
       }, 0);
     },
-    stop() {
-      this.source.stop(0);
+    // 启动
+    start() {
+      this.resume();
+      this.source.start(0);
+      this.audiostate = 1;
     },
+    // 停止，无法再次启动
+    stop() {
+      this.audiostate = 3;
+      this.audioContext.close();
+    },
+    // 暂停
+    suspend() {
+      this.audiostate = 2;
+      this.audioContext.suspend();
+    },
+    resume() {
+      this.audiostate = 1;
+      this.audioContext.resume()
+    }
 
   };
 
@@ -114,11 +150,11 @@
   } else if (typeof global !== 'undefined') {
     global.AudioVisualization = AudioVisualization;
   }
-  
+
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = AudioVisualization;
   }
-  
+
 })();
 
 

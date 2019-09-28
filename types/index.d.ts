@@ -15,7 +15,10 @@ declare class AudioVisualization {
   setVoiceSize(size: number): void;
   setFftSzie(fftSize: number): void;
   play(callback?: (obj: { frequency: Array<Number> }) => void): void;
+  start(): void;
   stop(): void;
+  suspend(): void;
+  resume(): void;
 }
 
 declare module "audio-visualization" {
