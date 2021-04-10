@@ -12,7 +12,7 @@
 
 ## 例子
 
-> 请参考: ./docs/demo.html 或者 [点击我](https://wuxinweb.github.io/audio-visualization/demo.html)
+> 请参考: ./docs/demo.html 或者 [点击我](https://notbucai.github.io/audio-visualization/demo.html)
 
 ## 使用方法  `已支持语法提示`
 1. script引入  
