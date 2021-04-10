@@ -1,5 +1,5 @@
 (function () {
-  function AudioVisualization({ url, loop = false }) {
+  function AudioVisualization ({ url, loop = false }) {
     // 音乐地址
     /** @type {String} */
     this.url = url;
@@ -25,18 +25,18 @@
   }
 
   AudioVisualization.prototype = {
-    get currentTime() {
+    get currentTime () {
       return this.audioContext && this.audioContext.currentTime;
     },
-    async init() {
-      await this.initAudioContext();
-      await this.intiAnalyser();
+    async init () {
+      this.initAudioContext();
+      this.intiAnalyser();
       await this.initAudioSource();
-      await this.initGain();
+      this.initGain();
       this.state = true;
     },
     // 初始化音频上下文
-    async initAudioContext() {
+    initAudioContext () {
       const AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 
       /** @type {AudioContext} */
@@ -44,13 +44,13 @@
       this.audioContext.suspend();
     },
     // 初始化音频时间和频率数据对象
-    async intiAnalyser() {
+    intiAnalyser () {
       this.analyser = this.audioContext.createAnalyser();
       this.analyser.smoothingTimeConstant = 0.9;
       this.setFftSzie(this._fftsize);
     },
     // 初始化音乐源
-    async initAudioSource() {
+    async initAudioSource () {
       const audioData = await this._getAudioData();
       // 解码音频文件
       const audioBuffer = await this.audioContext.decodeAudioData(audioData);
@@ -66,36 +66,36 @@
     },
     // 初始化设备控制
     // 控制音频图的整体增益（或音量）
-    async initGain() {
+    initGain () {
       this.gain = this.audioContext.createGain();
       this.source.connect(this.gain);
       this.gain.connect(this.audioContext.destination);
       this.setVoiceSize(10);
     },
-    initFrequency() {
+    initFrequency () {
       this.frequency = new Uint8Array(this.analyser.frequencyBinCount);
     },
     // 声音大小 size 表示大小 100分制
-    setVoiceSize(size) {
+    setVoiceSize (size) {
       this.gain.gain.setValueAtTime(size / 10, this.audioContext.currentTime);
       this.initFrequency();
     },
     // 设置要获取的数量 默认 64
-    setFftSzie(fftSize) {
+    setFftSzie (fftSize) {
       this.analyser.fftSize = fftSize * 2;
     },
     // 获取 audio 数据
-    async _getAudioData() {
+    async _getAudioData () {
       const res = await fetch(this.url);
       //网络资源并转成 arraybuffer
       const arraybufferData = await res.arrayBuffer();
       return arraybufferData;
     },
-    async _forFrequency() {
+    _forFrequency () {
       this.analyser.getByteFrequencyData(this.frequency);
     },
     // 轮询
-    exex(fn) {
+    exex (fn) {
       clearInterval(this.timerIndex);
       this.timerIndex = setInterval(() => {
         this._forFrequency();
@@ -105,7 +105,7 @@
     /**
      * @param {function} fn 回调
      */
-    play(fn) {
+    play (fn) {
       if (this.audiostate === 3) {
         throw new Error('已经停止无法继续请重新new一个对象');
       }
@@ -123,22 +123,22 @@
       }, 0);
     },
     // 启动
-    start() {
+    start () {
       this.resume();
       this.source.start(0);
       this.audiostate = 1;
     },
     // 停止，无法再次启动
-    stop() {
+    stop () {
       this.audiostate = 3;
       this.audioContext.close();
     },
     // 暂停
-    suspend() {
+    suspend () {
       this.audiostate = 2;
       this.audioContext.suspend();
     },
-    resume() {
+    resume () {
       this.audiostate = 1;
       this.audioContext.resume()
     }
